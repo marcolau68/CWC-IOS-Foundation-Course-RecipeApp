@@ -8,9 +8,10 @@
 import SwiftUI
 
 struct RecipeTabView: View {
+    
     var body: some View {
         TabView {
-            Text("Featured View")
+            RecipeFeaturedView()
                 .tabItem {
                     Image(systemName: "star.fill")
                     Text("Featured")
@@ -22,6 +23,7 @@ struct RecipeTabView: View {
                     Text("List")
                 }
         }
+        .environmentObject(RecipeModel())
     }
 }
 
