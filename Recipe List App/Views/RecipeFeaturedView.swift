@@ -10,8 +10,8 @@ import SwiftUI
 struct RecipeFeaturedView: View {
     
     @EnvironmentObject var model: RecipeModel
-//    var featuredRecipesList = FeaturedRecipes.listFeaturedRecipes(allRecipe: model.recipeList)
     @State var detailViewShow = false
+    @State var tabIndex = 0
     
     var body: some View {
         
@@ -24,7 +24,7 @@ struct RecipeFeaturedView: View {
                 .font(.largeTitle)
             
             GeometryReader { geo in
-                TabView {
+                TabView(selection: $tabIndex) {
                     ForEach(0..<model.recipeList.count) { index in
                         if model.recipeList[index].featured {
                             Button(action: {
@@ -49,6 +49,7 @@ struct RecipeFeaturedView: View {
                                 }
                                 
                             })
+                            .tag(index)
                             .sheet(isPresented: $detailViewShow) {
                                 // Show view when true
                                 RecipeDetailView(recipe: model.recipeList[index])
@@ -61,6 +62,7 @@ struct RecipeFeaturedView: View {
                         }
                         
                     }
+                    
                 }
                 .tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
                 .indexViewStyle(PageIndexViewStyle(backgroundDisplayMode: .always))
@@ -69,14 +71,26 @@ struct RecipeFeaturedView: View {
             VStack(alignment: .leading, spacing: 5) {
                 Text("Preparation Time: ")
                     .font(.headline)
-                Text("30 minutes")
+                Text(model.recipeList[tabIndex].prepTime)
                 Text("Highlights: ")
                     .font(.headline)
-                Text("Fast, tasty, simple")
+                Text(model.recipeList[tabIndex].chainHighlights())
             }
             .padding([.leading, .bottom], 10)
         }
+        .onAppear(perform: {
+            firstFeaturedIndex()
+        })
     }
+    
+    func firstFeaturedIndex() {
+        let index = model.recipeList.firstIndex  { (recipe) -> Bool in
+            return recipe.featured
+        }
+        
+        tabIndex = index ?? 0
+    }
+    
 }
 
 struct RecipeFeaturedView_Previews: PreviewProvider {

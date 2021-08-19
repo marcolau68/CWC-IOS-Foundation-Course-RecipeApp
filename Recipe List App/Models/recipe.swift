@@ -22,6 +22,21 @@ class Recipe: Identifiable, Decodable {
     var ingredients: [Ingredient]
     var directions: [String]
     
+    func chainHighlights () -> String {
+        var allHighlights = ""
+        
+        for i in 0..<highlights.count {
+            if i == highlights.count - 1 {
+                allHighlights += highlights[i]
+            }
+            else {
+                allHighlights += highlights[i] + ", "
+            }
+        }
+        
+        return allHighlights
+    }
+    
 }
 
 
