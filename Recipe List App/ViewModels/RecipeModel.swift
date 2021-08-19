@@ -20,19 +20,17 @@ class RecipeModel: ObservableObject {
     }
     
     static func getPortion(ingredient: Ingredient, recipeServing: Int, targetServing: Int) -> String {
+        var num = ingredient.num ?? 1
+        var denom = ingredient.denom ?? 1
+        var portion = ""
+        var unit: String
+
         if ingredient.num != nil {
             // Get single serving size by multiplying recipe serving size by denominator
-            var denom: Int
-
-            if ingredient.denom != nil {
-                denom = ingredient.denom! * recipeServing
-            }
-            else {
-                denom = recipeServing
-            }
+            denom *= recipeServing
 
             // Get target portion by multiplying target serving size by numerator
-            var num: Int = ingredient.num! * targetServing
+            num *= targetServing
 
             // Simplify fraction using largest factor
             var smallerNum: Int
@@ -65,38 +63,55 @@ class RecipeModel: ObservableObject {
             }
 
             // Get the whole number
-            // Get remainder in fraction
             var wholeNum = 0
             
-            if num > denom {
+            if num >= denom {
                 wholeNum = num / denom
-                num -= wholeNum * denom
+                num = num % denom
+                
+                portion += String(wholeNum)
             }
-
-            var unit = ""
-
-            if ingredient.unit != nil {
-                if wholeNum > 0 {
-                    unit = ingredient.unit! + "s "
-                }
-                else {
-                    unit = ingredient.unit! + " "
-                }
-
+            
+            // Get unit
+            if ingredient.unit != nil && (num != 0 || wholeNum != 0) {
+                unit = " " + ingredient.unit!
             }
-
-            if num == 0 {
-                return "\(wholeNum) \(unit)"
+            else if ingredient.unit != nil {
+                unit = ingredient.unit!
             }
             else {
-                if wholeNum > 0 {
-                    return "\(wholeNum) \(num)/\(denom) \(unit)"
+                unit = ""
+            }
+            
+            if unit != "" && ((wholeNum > 0 && num > 0) || (wholeNum  > 1)) {
+                if unit.suffix(2) == "ch" {
+                    unit += "es "
+                }
+                else if unit.suffix(1) == "f" {
+                    unit = String(unit.dropLast())
+                    unit += "ves "
                 }
                 else {
-                    return "\(num)/\(denom) \(unit)"
+                    unit += "s "
                 }
             }
+            else {
+                unit += " "
+            }
+        
+            // Get remainder in fraction
+            if num > 0 && wholeNum > 0{
+                portion += " \(num)/\(denom)"
+            }
+            else if num > 0 {
+                portion += "\(num)/\(denom)"
+            }
 
+            portion += unit
+            
+            return portion
+            
+            
         }
         else {
             if ingredient.unit != nil {
@@ -112,7 +127,16 @@ class RecipeModel: ObservableObject {
 
 
 
-
+//"""
+//scenarios
+//1. whole number + units
+//2. whole number + fraction + units
+//3. fraction + units
+//4. whole number
+//5. whole number + fractions
+//6. fractions
+//7. units
+//"""
 
 
 
