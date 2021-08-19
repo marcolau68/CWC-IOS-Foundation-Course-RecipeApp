@@ -11,6 +11,7 @@ struct RecipeFeaturedView: View {
     
     @EnvironmentObject var model: RecipeModel
 //    var featuredRecipesList = FeaturedRecipes.listFeaturedRecipes(allRecipe: model.recipeList)
+    @State var detailViewShow = false
     
     var body: some View {
         
@@ -26,7 +27,9 @@ struct RecipeFeaturedView: View {
                 TabView {
                     ForEach(0..<model.recipeList.count) { index in
                         if model.recipeList[index].featured {
-                            VStack {
+                            Button(action: {
+                                detailViewShow = true
+                            }, label: {
                                 ZStack {
                                     Rectangle()
                                         .foregroundColor(.white)
@@ -44,12 +47,17 @@ struct RecipeFeaturedView: View {
                                         
                                     }
                                 }
-                                .frame(width: geo.size.width*5/6, height: geo.size.height*6/7)
-                                .cornerRadius(30)
-                                .shadow(radius: 10)
                                 
-                                
+                            })
+                            .sheet(isPresented: $detailViewShow) {
+                                // Show view when true
+                                RecipeDetailView(recipe: model.recipeList[index])
                             }
+                            .buttonStyle(PlainButtonStyle())
+                            .frame(width: geo.size.width*5/6, height: geo.size.height*6/7)
+                            .cornerRadius(30)
+                            .shadow(radius: 10)
+                                
                         }
                         
                     }
