@@ -22,6 +22,12 @@ struct RecipeTabView: View {
                     Image(systemName: "list.bullet")
                     Text("List")
                 }
+            
+            AddRecipeView()
+                .tabItem {
+                    Image(systemName: "plus.circle")
+                    Text("Add")
+                }
         }
         .environmentObject(RecipeModel())
     }
