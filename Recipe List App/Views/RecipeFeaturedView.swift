@@ -10,15 +10,13 @@ import SwiftUI
 struct RecipeFeaturedView: View {
     
     @Environment(\.managedObjectContext) private var viewContext
-//    @EnvironmentObject var model: RecipeModel
     @State var detailViewShow = false
     @State var tabIndex = 0
     
-    @FetchRequest(sortDescriptors: []) var recipes: FetchedResults<Recipe>
+    @FetchRequest(sortDescriptors: [NSSortDescriptor(key: "name", ascending: true)], predicate: NSPredicate(format: "featured == true"))
+    var recipes: FetchedResults<Recipe>
     
     var body: some View {
-        
-        
         VStack(alignment: .leading, spacing: 0){
             Text("Featured Recipes")
                 .bold()
@@ -29,45 +27,38 @@ struct RecipeFeaturedView: View {
             GeometryReader { geo in
                 TabView(selection: $tabIndex) {
                     ForEach(0..<recipes.count) { index in
-                        if recipes[index].featured {
-                            Button(action: {
-                                detailViewShow = true
-                            }, label: {
-                                ZStack {
-                                    Rectangle()
-                                        .foregroundColor(.white)
-                                        
+                        Button(action: {
+                            detailViewShow = true
+                        }, label: {
+                            ZStack {
+                                Rectangle()
+                                    .foregroundColor(.white)
                                     
-                                    VStack(spacing: 0) {
-                                        let image = UIImage(data: recipes[index].image ?? Data()) ?? UIImage()
-                                        Image(uiImage: image)
-                                            .resizable()
-                                            .aspectRatio(contentMode: .fill)
-                                            .clipped()
-                                        
-                                        Text(recipes[index].name)
-                                            .padding(5)
-                                            .font(Font.custom("Avenir", size: 16))
-                                        
-                                        
-                                    }
+                                VStack(spacing: 0) {
+                                    let image = UIImage(data: recipes[index].image ?? Data()) ?? UIImage()
+                                    Image(uiImage: image)
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill)
+                                        .clipped()
+                                    
+                                    Text(recipes[index].name)
+                                        .padding(5)
+                                        .font(Font.custom("Avenir", size: 16))
+                                    
                                 }
-                                
-                            })
-                            .tag(index)
-                            .sheet(isPresented: $detailViewShow) {
-                                // Show view when true
-                                RecipeDetailView(recipe: recipes[index])
                             }
-                            .buttonStyle(PlainButtonStyle())
-                            .frame(width: geo.size.width*5/6, height: geo.size.height*6/7)
-                            .cornerRadius(30)
-                            .shadow(radius: 10)
-                                
+                            
+                        })
+                        .tag(index)
+                        .sheet(isPresented: $detailViewShow) {
+                            // Show view when true
+                            RecipeDetailView(recipe: recipes[index])
                         }
-                        
+                        .buttonStyle(PlainButtonStyle())
+                        .frame(width: geo.size.width*5/6, height: geo.size.height*6/7)
+                        .cornerRadius(30)
+                        .shadow(radius: 10)
                     }
-                    
                 }
                 .tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
                 .indexViewStyle(PageIndexViewStyle(backgroundDisplayMode: .always))
@@ -103,6 +94,5 @@ struct RecipeFeaturedView: View {
 struct RecipeFeaturedView_Previews: PreviewProvider {
     static var previews: some View {
         RecipeFeaturedView()
-            .environmentObject(RecipeModel())
     }
 }
