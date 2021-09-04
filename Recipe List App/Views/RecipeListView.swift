@@ -10,8 +10,20 @@ import SwiftUI
 struct RecipeListView: View {
     
     @Environment(\.managedObjectContext) private var viewContext
-    @EnvironmentObject var model: RecipeModel
-    
+    @FetchRequest(sortDescriptors: [NSSortDescriptor(key: "name", ascending: true)]) var recipes: FetchedResults<Recipe>
+    @State private var filterText = ""
+    private var filteredRecipes: [Recipe] {
+        if filterText == "" {
+            return Array(recipes)
+        }
+        else {
+            return recipes.filter { r in
+                return r.name.contains(filterText)
+            }
+        }
+        
+    }
+
     var body: some View {
         
         NavigationView {
@@ -21,10 +33,34 @@ struct RecipeListView: View {
                     .padding(.leading)
                     .padding(.top, 30)
                     .font(Font.custom("Avenir Heavy", size: 36))
-
+                
+                ZStack {
+                    Rectangle()
+                        .foregroundColor(.white)
+                        .cornerRadius(5)
+                        .shadow(radius: 4)
+                    
+                    HStack(spacing: 5) {
+                        Image(systemName: "magnifyingglass")
+                        TextField("Search: ", text: $filterText)
+                        
+                        Spacer()
+                        
+                        Button(action: {
+                            filterText = ""
+                        }, label: {
+                            Image(systemName: "multiply.circle.fill")
+                        })
+                    }
+                    .padding(.horizontal, 10)
+                }
+                .frame(height: 48)
+                .padding()
+                .foregroundColor(.gray)
+                
                 ScrollView {
                     LazyVStack(alignment: .leading) {
-                        ForEach(model.recipeList) { r in
+                        ForEach(filteredRecipes) { r in
                             NavigationLink(
                                 destination: RecipeDetailView(recipe: r),
                                 label: {
@@ -58,9 +94,13 @@ struct RecipeListView: View {
                 
             }
             .navigationBarHidden(true)
+            .onTapGesture {
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            }
         }
         
     }
+
 }
 
 struct RecipeListView_Preview: PreviewProvider {
