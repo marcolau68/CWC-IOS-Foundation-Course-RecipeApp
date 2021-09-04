@@ -20,6 +20,11 @@ struct AddRecipeView: View {
     @State private var directions = [String]()
     
     @State private var ingredients = [IngredientJSON]()
+    
+    @State private var openImagePicker = false
+    @State private var imageSource = UIImagePickerController.SourceType.photoLibrary
+    
+    @State private var recipeImage: UIImage?
 
     var body: some View {
         VStack {
@@ -45,21 +50,37 @@ struct AddRecipeView: View {
             }
             .padding(.bottom)
             
-            Image("noImageAvailable")
-                .resizable()
-                .scaledToFit()
+            if recipeImage == nil {
+                Image("noImageAvailable")
+                    .resizable()
+                    .scaledToFit()
+            }
+            else {
+                Image(uiImage: recipeImage!)
+                    .resizable()
+                    .scaledToFit()
+                    .cornerRadius(10)
+            }
             
             HStack {
                 Spacer()
                 
                 Button("Photo Library") {
-                    
+                    openImagePicker = true
+                    imageSource = UIImagePickerController.SourceType.photoLibrary
+                }
+                .sheet(isPresented: $openImagePicker) {
+                    ImagePicker(recipeImage: $recipeImage, source: imageSource)
                 }
                 
                 Spacer()
                 
                 Button("Camera") {
-                    
+                    openImagePicker = true
+                    imageSource = UIImagePickerController.SourceType.camera
+                }
+                .sheet(isPresented: $openImagePicker) {
+                    ImagePicker(recipeImage: $recipeImage, source: imageSource)
                 }
                 
                 Spacer()
