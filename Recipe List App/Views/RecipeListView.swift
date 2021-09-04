@@ -8,7 +8,8 @@
 import SwiftUI
 
 struct RecipeListView: View {
-        
+    
+    @Environment(\.managedObjectContext) private var viewContext
     @EnvironmentObject var model: RecipeModel
     
     var body: some View {
@@ -29,7 +30,8 @@ struct RecipeListView: View {
                                 label: {
                                     // Row Item
                                     HStack(spacing: 20){
-                                        Image(r.image)
+                                        let image = UIImage(data: r.image ?? Data()) ?? UIImage()
+                                        Image(uiImage: image)
                                             .resizable()
                                             .scaledToFill()
                                             .frame(width: 50, height: 50, alignment: .center)

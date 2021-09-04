@@ -1,26 +1,16 @@
 //
-//  recipe.swift
+//  Recipe+CoreDataClass.swift
 //  Recipe List App
 //
-//  Created by Marco Lau on 10/08/2021.
+//  Created by Marco Lau on 04/09/2021.
+//
 //
 
 import Foundation
+import CoreData
 
-class RecipeJSON: Identifiable, Decodable {
-    
-    var id: UUID?
-    var name: String
-    var featured: Bool
-    var image: String
-    var description: String
-    var prepTime: String
-    var cookTime: String
-    var totalTime: String
-    var servings: Int
-    var highlights: [String]
-    var ingredients: [IngredientJSON]
-    var directions: [String]
+@objc(Recipe)
+public class Recipe: NSManagedObject {
     
     func chainHighlights () -> String {
         var allHighlights = ""
@@ -38,9 +28,3 @@ class RecipeJSON: Identifiable, Decodable {
     }
     
 }
-
-
-
-
-
-
