@@ -9,6 +9,10 @@ import SwiftUI
 
 struct AddRecipeView: View {
     
+    @Binding var tabIndex: Int
+    
+    @Environment(\.managedObjectContext) private var viewContext
+    
     @State private var name = ""
     @State private var summary = ""
     @State private var prepTime = ""
@@ -32,7 +36,7 @@ struct AddRecipeView: View {
                 Button(action: {
                     clear()
                 }, label: {
-                    Text("Cancel")
+                    Text("Clear")
                 })
                 
                 Spacer()
@@ -43,6 +47,9 @@ struct AddRecipeView: View {
                     
                     // Clear sheet
                     clear()
+                    
+                    // Switch to list view
+                    tabIndex = 1
                     
                 }, label: {
                     Text("Add")
@@ -117,9 +124,45 @@ struct AddRecipeView: View {
         directions = [String]()
         
         ingredients = [IngredientJSON]()
+        
+        recipeImage = nil
     }
     
     func add() {
+        let recipe = Recipe(context: viewContext)
+        
+        recipe.id = UUID()
+        recipe.name = name
+        recipe.summary = summary
+        recipe.prepTime = prepTime
+        recipe.cookTime = cookTime
+        recipe.totalTime = totalTime
+        recipe.servings = Int(servings) ?? 1
+        recipe.highlights = highlights
+        recipe.directions = directions
+        recipe.image = recipeImage?.pngData()
+                
+        for i in ingredients {
+            let ingredient = Ingredient(context: viewContext)
+            
+            ingredient.name = i.name
+            ingredient.id = UUID()
+            ingredient.num = i.num ?? 1
+            ingredient.denom = i.denom ?? 1
+            ingredient.unit = i.unit
+            
+            recipe.addToIngredients(ingredient)
+        }
+        
+        do {
+            try viewContext.save()
+            
+        }
+        catch {
+            // Can't save recipe
+        }
+        
+        
         
     }
 }

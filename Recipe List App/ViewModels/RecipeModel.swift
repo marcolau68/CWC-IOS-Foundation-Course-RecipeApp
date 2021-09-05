@@ -75,12 +75,13 @@ class RecipeModel: ObservableObject {
         do {
             try managedObjectContext.save()
             
-            // Set local storage flag
-            UserDefaults.standard.setValue(true, forKey: Constants.isDataPreloaded)
         }
         catch {
             
         }
+        
+        // Set local storage flag
+        UserDefaults.standard.setValue(true, forKey: Constants.isDataPreloaded)
     }
     
     static func getPortion(ingredient: Ingredient, recipeServing: Int, targetServing: Int) -> String {
